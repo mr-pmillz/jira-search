@@ -145,9 +145,9 @@ func getPriorityColor(priority string) tablewriter.Colors {
 	}
 }
 
-func getFieldString(name string) string {
-	if name != "" {
-		return name
+func getFieldString(name interface{}) string {
+	if name != nil {
+		return name.(string)
 	}
 	return "N/A"
 }
@@ -155,10 +155,11 @@ func getFieldString(name string) string {
 // PrintTable ...
 func PrintTable(issues []jira.Issue, host string) error {
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Issue", "Summary", "Status", "Priority", "URL", "Reporter"})
+	table.SetHeader([]string{"Issue", "Summary", "Project", "Status", "Priority", "URL", "Reporter"})
 	table.SetBorder(false)
 
 	table.SetHeaderColor(
+		tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiYellowColor, tablewriter.BgBlackColor},
 		tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiYellowColor, tablewriter.BgBlackColor},
 		tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiYellowColor, tablewriter.BgBlackColor},
 		tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiYellowColor, tablewriter.BgBlackColor},
@@ -174,11 +175,13 @@ func PrintTable(issues []jira.Issue, host string) error {
 		tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiWhiteColor, tablewriter.BgBlackColor},
 		tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiWhiteColor, tablewriter.BgBlackColor},
 		tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiWhiteColor, tablewriter.BgBlackColor},
+		tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiWhiteColor, tablewriter.BgBlackColor},
 	)
 
 	for _, issue := range issues {
 		colorData := []string{issue.Key,
 			issue.Fields.Summary,
+			issue.Fields.Project.Name,
 			issue.Fields.Status.Name,
 			issue.Fields.Priority.Name,
 			fmt.Sprintf("%s/browse/%s", host, issue.Key),
@@ -186,6 +189,7 @@ func PrintTable(issues []jira.Issue, host string) error {
 		}
 
 		table.Rich(colorData, []tablewriter.Colors{
+			{tablewriter.Normal},
 			{tablewriter.Normal},
 			{tablewriter.Normal},
 			isDone(issue.Fields.Status.Name),

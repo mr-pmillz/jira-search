@@ -14,6 +14,8 @@ type Options struct {
 	JiraUserName       string
 	JiraProjectName    string
 	JQLTextSearch      string
+	JQLRawSearch       string
+	MyJiraIssues       bool
 	JiraClientID       string
 	JiraClientSecret   string
 }
@@ -28,12 +30,20 @@ func ConfigureCommand(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringP("jira-username", "", "", "jira username")
 	cmd.PersistentFlags().StringP("jira-project-name", "", "", "a project name in jira you want to search")
 	cmd.PersistentFlags().StringP("jql-text-search", "", "", "a string of text that you want to search all issues for")
+	cmd.PersistentFlags().StringP("jql-raw-search", "", "", "a string of text that you want to search all issues for")
+	cmd.PersistentFlags().BoolP("my-jira-issues", "", false, "find all issues assigned and in progress assigned to JIRA_ACCOUNT_ID from config.yaml")
 	cmd.PersistentFlags().StringP("jira-client-id", "", "", "jira client id for oauth2")
 	cmd.PersistentFlags().StringP("jira-client-secret", "", "", "jira client secret for oauth2")
 }
 
 // LoadFromCommand loads all the command flag opts from cli and config file into Options struct
 func (opts *Options) LoadFromCommand(cmd *cobra.Command) error {
+	myJiraIssues, err := cmd.Flags().GetBool("my-jira-issues")
+	if err != nil {
+		return err
+	}
+	opts.MyJiraIssues = myJiraIssues
+
 	jiraClientID, err := utils.ConfigureFlagOpts(cmd, &utils.LoadFromCommandOpts{
 		Flag: "jira-client-id",
 		Opts: opts.JiraClientID,
@@ -132,5 +142,17 @@ func (opts *Options) LoadFromCommand(cmd *cobra.Command) error {
 		return err
 	}
 	opts.JQLTextSearch = jqlTextSearch.(string)
+
+	jqlRawSearch, err := utils.ConfigureFlagOpts(cmd, &utils.LoadFromCommandOpts{
+		Flag:       "jql-raw-search",
+		IsFilePath: false,
+		Prefix:     "",
+		Opts:       opts.JQLRawSearch,
+	})
+	if err != nil {
+		return err
+	}
+	opts.JQLRawSearch = jqlRawSearch.(string)
+
 	return nil
 }

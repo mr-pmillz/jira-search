@@ -43,10 +43,18 @@ func NewJiraClient(opts *Options) (*JiraClient, error) {
 	return j, nil
 }
 
-// ProcessTickets searches for matching ticket types and completes them as needed.
-func (jc *JiraClient) ProcessTickets() error {
+// PrintFoundTickets searches for matching ticket types and prints them
+func (jc *JiraClient) PrintFoundTickets() error {
 	// Ensure that there is a matching ticket for the current project with this JQL query.
-	jql := fmt.Sprintf("text ~ \"%s\" ORDER BY created ASC", jc.opts.JQLTextSearch)
+	var jql string
+	if jc.opts.JQLRawSearch != "" {
+		jql = fmt.Sprintf("%s", jc.opts.JQLRawSearch)
+	} else if jc.opts.MyJiraIssues {
+		jql = fmt.Sprintf("status in (\"Ready for work\", \"In Progress\", \"Deploy Ready\") AND assignee in ( %s ) ORDER BY created ASC", jc.opts.JiraAccountID)
+	} else {
+		jql = fmt.Sprintf("text ~ \"%s\" ORDER BY created ASC", jc.opts.JQLTextSearch)
+	}
+	//jql := fmt.Sprintf("text ~ \"%s\" ORDER BY created ASC", jc.opts.JQLTextSearch)
 	issues, resp, err := jc.client.Issue.Search(jql, &jira.SearchOptions{
 		Fields: []string{
 			"attachment",

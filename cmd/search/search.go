@@ -40,7 +40,7 @@ var RootSearchCommand = &cobra.Command{
 			log.Panic(err)
 		}
 
-		if err = jc.ProcessTickets(); err != nil {
+		if err = jc.PrintFoundTickets(); err != nil {
 			log.Panic(err)
 		}
 
