@@ -1,0 +1,5 @@
+config.yaml
+jira-search
+.idea/*
+jira.pem
+jira.pub
