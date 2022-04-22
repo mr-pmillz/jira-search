@@ -3,12 +3,15 @@ package client
 import (
 	"context"
 	"fmt"
+
 	"github.com/andygrunwald/go-jira"
+
 	//"github.com/dghubble/oauth1"
-	"github.com/mr-pmillz/jira-search/utils"
-	"github.com/sirupsen/logrus"
 	"io"
 	"os"
+
+	"github.com/mr-pmillz/jira-search/utils"
+	"github.com/sirupsen/logrus"
 )
 
 type JiraClient struct {
@@ -43,41 +46,74 @@ func NewJiraClient(opts *Options) (*JiraClient, error) {
 	return j, nil
 }
 
+// GetAllIssues will implement pagination of api and get all the issues.
+// Jira API has limitation as to maxResults it can return at one time.
+// You may have usecase where you need to get all the issues according to jql
+// This is where this example comes in.
+func (jc *JiraClient) GetAllIssues(searchString string) ([]jira.Issue, error) {
+	last := 0
+	var issues []jira.Issue
+	for {
+		opt := &jira.SearchOptions{
+			MaxResults: 1000, // Max results can go up to 1000
+			StartAt:    last,
+			Fields: []string{
+				"attachment",
+				"key",
+				"issuetype",
+				"summary",
+				"reporter",
+				"status",
+				"description",
+				"project",
+				"priority"},
+		}
+
+		chunk, resp, err := jc.client.Issue.Search(searchString, opt)
+		if err != nil {
+			return nil, err
+		}
+
+		total := resp.Total
+		if issues == nil {
+			issues = make([]jira.Issue, 0, total)
+		}
+		issues = append(issues, chunk...)
+		last = resp.StartAt + len(chunk)
+		if last >= total {
+			return issues, nil
+		}
+	}
+
+}
+
 // PrintFoundTickets searches for matching ticket types and prints them
 func (jc *JiraClient) PrintFoundTickets() error {
 	// Ensure that there is a matching ticket for the current project with this JQL query.
 	var jql string
 	if jc.opts.JQLRawSearch != "" {
-		jql = fmt.Sprintf("%s", jc.opts.JQLRawSearch)
+		jql = jc.opts.JQLRawSearch
 	} else if jc.opts.MyJiraIssues {
 		jql = fmt.Sprintf("status in (\"Ready for work\", \"In Progress\", \"Deploy Ready\") AND assignee in ( %s ) ORDER BY created ASC", jc.opts.JiraAccountID)
 	} else {
 		jql = fmt.Sprintf("text ~ \"%s\" ORDER BY created ASC", jc.opts.JQLTextSearch)
 	}
 	//jql := fmt.Sprintf("text ~ \"%s\" ORDER BY created ASC", jc.opts.JQLTextSearch)
-	issues, resp, err := jc.client.Issue.Search(jql, &jira.SearchOptions{
-		Fields: []string{
-			"attachment",
-			"key",
-			"issuetype",
-			"summary",
-			"reporter",
-			"status",
-			"description",
-			"project",
-			"priority"},
-		MaxResults: 200,
-	},
-	)
+	issues, err := jc.GetAllIssues(jql)
 	if err != nil {
 		return err
 	}
 
-	total := resp.Total
+	total := len(issues)
 
 	if total >= 1 {
+		if jc.opts.RerverseIssues {
+			for i, j := 0, len(issues)-1; i < j; i, j = i+1, j-1 {
+				issues[i], issues[j] = issues[j], issues[i]
+			}
+		}
 		if err = utils.PrintTable(issues, jc.opts.JiraHost); err != nil {
-			return nil
+			return err
 		}
 	} else {
 		fmt.Printf("[-] No Issues Found Matching this JQL Search: \n%s\n", jql)

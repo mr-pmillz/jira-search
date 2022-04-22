@@ -16,6 +16,7 @@ type Options struct {
 	JQLTextSearch      string
 	JQLRawSearch       string
 	MyJiraIssues       bool
+	RerverseIssues     bool
 	JiraClientID       string
 	JiraClientSecret   string
 }
@@ -32,6 +33,7 @@ func ConfigureCommand(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringP("jql-text-search", "", "", "a string of text that you want to search all issues for")
 	cmd.PersistentFlags().StringP("jql-raw-search", "", "", "a string of text that you want to search all issues for")
 	cmd.PersistentFlags().BoolP("my-jira-issues", "", false, "find all issues assigned and in progress assigned to JIRA_ACCOUNT_ID from config.yaml")
+	cmd.PersistentFlags().BoolP("reverse-issues", "", false, "reverse found issues in table")
 	cmd.PersistentFlags().StringP("jira-client-id", "", "", "jira client id for oauth2")
 	cmd.PersistentFlags().StringP("jira-client-secret", "", "", "jira client secret for oauth2")
 }
@@ -43,6 +45,12 @@ func (opts *Options) LoadFromCommand(cmd *cobra.Command) error {
 		return err
 	}
 	opts.MyJiraIssues = myJiraIssues
+
+	reverseIssues, err := cmd.Flags().GetBool("reverse-issues")
+	if err != nil {
+		return err
+	}
+	opts.RerverseIssues = reverseIssues
 
 	jiraClientID, err := utils.ConfigureFlagOpts(cmd, &utils.LoadFromCommandOpts{
 		Flag: "jira-client-id",

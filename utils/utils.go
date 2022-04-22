@@ -2,14 +2,15 @@ package utils
 
 import (
 	"fmt"
-	"github.com/andygrunwald/go-jira"
-	"github.com/olekukonko/tablewriter"
 	"io"
 	"io/ioutil"
 	"os"
 	"os/user"
 	"path/filepath"
 	"strings"
+
+	"github.com/andygrunwald/go-jira"
+	"github.com/olekukonko/tablewriter"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
