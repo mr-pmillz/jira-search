@@ -66,6 +66,7 @@ func (jc *JiraClient) PrintFoundTickets() error {
 			"description",
 			"project",
 			"priority"},
+		MaxResults: 200,
 	},
 	)
 	if err != nil {
