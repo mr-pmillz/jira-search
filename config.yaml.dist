@@ -1,0 +1,7 @@
+JIRA_HOST: "https://yourcompany.atlassian.net"
+JIRA_USER_EMAIL: "YourEmail"
+JIRA_API_KEY: "YourAPIKey"
+JIRA_ACCOUNT_ID: "YourAccountID"
+JIRA_USERNAME: "YourUsername"
+JIRA_PROJECT_NAME: "" # optional, unused
+
