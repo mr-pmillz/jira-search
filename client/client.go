@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/andygrunwald/go-jira"
 	"io"
 	"os"
+
+	"github.com/andygrunwald/go-jira"
 
 	"github.com/mr-pmillz/jira-search/utils"
 	"github.com/sirupsen/logrus"
