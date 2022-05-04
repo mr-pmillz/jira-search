@@ -6,19 +6,16 @@ import (
 )
 
 type Options struct {
-	JiraHost           string
-	JiraUserEmail      string
-	JiraAPIKey         string
-	JiraPrivateKeyFile string
-	JiraAccountID      string
-	JiraUserName       string
-	JiraProjectName    string
-	JQLTextSearch      string
-	JQLRawSearch       string
-	MyJiraIssues       bool
-	RerverseIssues     bool
-	JiraClientID       string
-	JiraClientSecret   string
+	JiraHost        string
+	JiraUserEmail   string
+	JiraAPIKey      string
+	JiraAccountID   string
+	JiraUserName    string
+	JiraProjectName string
+	JQLTextSearch   string
+	JQLRawSearch    string
+	MyJiraIssues    bool
+	RerverseIssues  bool
 }
 
 // ConfigureCommand ...
@@ -26,7 +23,6 @@ func ConfigureCommand(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringP("jira-host", "", "", "jira host url ex. https://foobar.atlassian.net")
 	cmd.PersistentFlags().StringP("jira-user-email", "", "", "jira user email address")
 	cmd.PersistentFlags().StringP("jira-api-key", "", "", "jira api key")
-	cmd.PersistentFlags().StringP("jira-private-key-file", "", "", "jira private key file")
 	cmd.PersistentFlags().StringP("jira-account-id", "", "", "jira account id of api key user")
 	cmd.PersistentFlags().StringP("jira-username", "", "", "jira username")
 	cmd.PersistentFlags().StringP("jira-project-name", "", "", "a project name in jira you want to search")
@@ -34,8 +30,6 @@ func ConfigureCommand(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringP("jql-raw-search", "", "", "a string of text that you want to search all issues for")
 	cmd.PersistentFlags().BoolP("my-jira-issues", "", false, "find all issues assigned and in progress assigned to JIRA_ACCOUNT_ID from config.yaml")
 	cmd.PersistentFlags().BoolP("reverse-issues", "", false, "reverse found issues in table")
-	cmd.PersistentFlags().StringP("jira-client-id", "", "", "jira client id for oauth2")
-	cmd.PersistentFlags().StringP("jira-client-secret", "", "", "jira client secret for oauth2")
 }
 
 // LoadFromCommand loads all the command flag opts from cli and config file into Options struct
@@ -52,24 +46,6 @@ func (opts *Options) LoadFromCommand(cmd *cobra.Command) error {
 	}
 	opts.RerverseIssues = reverseIssues
 
-	jiraClientID, err := utils.ConfigureFlagOpts(cmd, &utils.LoadFromCommandOpts{
-		Flag: "jira-client-id",
-		Opts: opts.JiraClientID,
-	})
-	if err != nil {
-		return err
-	}
-	opts.JiraClientID = jiraClientID.(string)
-
-	jiraClientSecret, err := utils.ConfigureFlagOpts(cmd, &utils.LoadFromCommandOpts{
-		Flag: "jira-client-secret",
-		Opts: opts.JiraClientSecret,
-	})
-	if err != nil {
-		return err
-	}
-	opts.JiraClientSecret = jiraClientSecret.(string)
-
 	jiraHost, err := utils.ConfigureFlagOpts(cmd, &utils.LoadFromCommandOpts{
 		Flag: "jira-host",
 		Opts: opts.JiraHost,
@@ -78,16 +54,6 @@ func (opts *Options) LoadFromCommand(cmd *cobra.Command) error {
 		return err
 	}
 	opts.JiraHost = jiraHost.(string)
-
-	jiraPrivateKeyFile, err := utils.ConfigureFlagOpts(cmd, &utils.LoadFromCommandOpts{
-		Flag:       "jira-private-key-file",
-		IsFilePath: true,
-		Opts:       opts.JiraPrivateKeyFile,
-	})
-	if err != nil {
-		return err
-	}
-	opts.JiraPrivateKeyFile = jiraPrivateKeyFile.(string)
 
 	jiraUserEmail, err := utils.ConfigureFlagOpts(cmd, &utils.LoadFromCommandOpts{
 		Flag: "jira-user-email",
