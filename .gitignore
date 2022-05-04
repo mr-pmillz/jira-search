@@ -3,3 +3,7 @@ jira-search
 .idea/*
 jira.pem
 jira.pub
+bin
+bin/
+dist/
+dist

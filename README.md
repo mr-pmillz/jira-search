@@ -33,6 +33,8 @@ create your config.yaml file
 cp config.yaml.dist config.yaml
 ```
 
+create yourself an api key in your jira account profile
+
 ## Usage
 
 ```shell

@@ -5,8 +5,6 @@ import (
 	"fmt"
 
 	"github.com/andygrunwald/go-jira"
-
-	//"github.com/dghubble/oauth1"
 	"io"
 	"os"
 
