@@ -8,13 +8,12 @@ GOTESTFMT := $(shell command -v gotestfmt 2>/dev/null)
 MIN_GOLANGCI_LINT_VERSION := 001043000
 export TERM=xterm-256color
 
-.PHONY: fmt lint build test clean compile compress
+.PHONY: fmt lint build test
 
 default: all
 
 all: fmt lint build test release
 
-release: clean build compile compress
 
 fmt:
 	$(info ******************** checking formatting ********************)
@@ -55,22 +54,7 @@ test:
 		richgo test -v ./...
     endif
 
-clean:
-	rm -rf $(BIN) 2>/dev/null
-
 build:
 	go env -w GOFLAGS=-mod=mod
 	go mod tidy
 	go build -v .
-
-compile:
-	GOOS=linux GOARCH=amd64 go build -o bin/linux/amd64/jira-search-$(CURRENT_TAG)-linux-amd64 main.go
-	GOOS=linux GOARCH=arm64 go build -o bin/linux/arm64/jira-search-$(CURRENT_TAG)-linux-arm64 main.go
-	GOOS=darwin GOARCH=amd64 go build -o bin/darwin/amd64/jira-search-$(CURRENT_TAG)-x86_64-apple-darwin_amd64 main.go
-	GOOS=darwin GOARCH=arm64 go build -o bin/darwin/arm64/jira-search-$(CURRENT_TAG)-x86_64-apple-darwin_arm64 main.go
-
-compress:
-	gzip -9 bin/linux/amd64/jira-search-$(CURRENT_TAG)-linux-amd64
-	gzip -9 bin/linux/arm64/jira-search-$(CURRENT_TAG)-linux-arm64
-	gzip -9 bin/darwin/amd64/jira-search-$(CURRENT_TAG)-x86_64-apple-darwin_amd64
-	gzip -9 bin/darwin/arm64/jira-search-$(CURRENT_TAG)-x86_64-apple-darwin_arm64
