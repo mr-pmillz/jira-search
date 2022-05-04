@@ -64,3 +64,9 @@ Search for all issues assigned to you and in various status types
 jira-search --config /path/to/your/config.yaml search --jql-raw-search 'assignee = "Babu Bott" AND status in ("Ready for Work", "In Progress")'
 ```
 
+Make an alias
+
+```shell
+alias mywork="jira-search --config /path/to/your/config.yaml search --jql-raw-search 'assignee = \"Babu Bott\" AND status in (\"Ready for Work\", \"In Progress\")'"
+```
+

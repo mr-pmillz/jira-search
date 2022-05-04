@@ -16,15 +16,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// PrettyPrint ...
-//func PrettyPrint(v interface{}) (err error) {
-//	b, err := json.MarshalIndent(v, "", "  ")
-//	if err == nil {
-//		fmt.Println(string(b))
-//	}
-//	return
-//}
-
 type LoadFromCommandOpts struct {
 	DefaultFlagVal string
 	Flag           string
